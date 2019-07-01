@@ -1,0 +1,64 @@
+{% extends 'inventory/home.html' %}
+
+{% block pagetitle %}Produtos{% endblock %}
+
+
+{% block main_content %}
+    <div class="row">
+        <div class="col-md-9">
+            {% if all_product_list %}
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Quantidade Atual</th>
+                        <th>Unidade</th>
+                        <th>Alteração Stock</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for product in all_product_list %}
+                        <tr>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.actual_quantity}}</td>
+                            <td>{{ product.get_unit_display}}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i></button>
+                                <button type="button" class="btn btn-danger btn-sm"><i class="fas fa-minus "></i></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            {% endif %}
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <h2 class="card-header h5">Filtros</h2>
+                <div class="card-body">
+                    <form method="get">
+                        {% load crispy_forms_tags %}
+                        {{ filter_form|crispy }}
+
+                        <div class="form-group">
+                            <button class="btn btn-outline-dark" type="submit">
+                                <i class="fas fa-filter"></i> Filtrar
+                            </button>
+                            <a class="btn btn-outline-secondary" href="#" role="button">
+                                <i class="fas fa-eraser"></i> Limpar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+
+
+{% endblock %}
