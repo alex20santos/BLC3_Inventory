@@ -44,14 +44,29 @@
                                 Produtos
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link  {% if active_page == 'stock_output' %} active{% endif %}" href="{% url 'remove_stock' %}">
+                                <span data-feather="log-out"></span>
+                                Saída de Stock
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link  {% if active_page == 'stock_input' %} active{% endif %}" href="{% url 'all_products_list' %}">
+                                <span data-feather="log-in"></span>
+                                Entrada de Stock
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>
 
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+                {% block pagetitle %}
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h1 class="h2">{% block pagetitle %}Dashboard{% endblock %}</h1>
+                    <h1 class="h2">Dashboard</h1>
                 </div>
+                {% endblock %}
 
                 {% block main_content %}
                     <canvas class="my-4" id="myChart" width="900" height="380"></canvas>

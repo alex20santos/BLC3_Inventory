@@ -1,0 +1,20 @@
+{% extends 'inventory/home.html' %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% load i18n static %}
+
+
+
+{% block main_content %}
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                Remover Stock
+            </div>
+            <div class="card-body">
+                {% crispy form %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

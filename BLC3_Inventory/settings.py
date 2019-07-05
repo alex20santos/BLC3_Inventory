@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'crispy_forms',
     'inventory.apps.InventoryConfig',
+    'users.apps.UsersConfig',
 
 ]
 
