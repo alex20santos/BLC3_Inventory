@@ -28,8 +28,8 @@
 <script src="{% static 'inventory/libraries/django-dynamic-formset/jquery.formset.js' %}"></script>
 <script type="text/javascript">
     $('.formset_row-{{ formset.prefix }}').formset({
-        addText: 'add another',
-        deleteText: 'remove',
+        addText: 'adicionar',
+        deleteText: 'remover',
         prefix: '{{ formset.prefix }}',
     });
 </script>

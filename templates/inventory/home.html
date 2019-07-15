@@ -50,13 +50,14 @@
                                 Saída de Stock
                             </a>
                         </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link  {% if active_page == 'stock_input' %} active{% endif %}" href="{% url 'all_products_list' %}">
-                                <span data-feather="log-in"></span>
-                                Entrada de Stock
-                            </a>
-                        </li>
+                        {% if user.profile.is_admin == True %}
+                            <li class="nav-item">
+                                <a class="nav-link  {% if active_page == 'stock_input' %} active{% endif %}" href="{% url 'add_stock' %}">
+                                    <span data-feather="log-in"></span>
+                                    Entrada de Stock
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </nav>
@@ -220,6 +221,7 @@
 
     <!-- Graphs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+
     <script>
         var ctx = document.getElementById("myChart");
         var myChart = new Chart(ctx, {
@@ -231,7 +233,7 @@
                     lineTension: 0,
                     backgroundColor: 'transparent',
                     borderColor: '#007bff',
-                    borderWidth: 4,
+                    borderWidth: 1,
                     pointBackgroundColor: '#007bff'
                 }]
             },

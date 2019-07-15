@@ -28,22 +28,12 @@ class Product(models.Model):
         return self.name
 
 
-class Movement(models.Model):
-    class Meta:
-        verbose_name = _('Movimentação')
-
-    created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
-
-    def __str__(self):
-        return "movement : " +  str(self.id)
-
 class OutputMovement(models.Model):
     class Meta:
         verbose_name = _('Movimentação Saída')
-
-    movement = models.ForeignKey(Movement, on_delete=models.CASCADE,blank=True,verbose_name=_('movimentação'))
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     product = models.ForeignKey(Product, on_delete=models.CASCADE,blank=True,verbose_name=_('produto'))
-    quantity  = models.PositiveIntegerField(verbose_name=_("quantidade"))
+    quantity  = models.PositiveIntegerField(null=True,verbose_name=_("quantidade"))
 
     def __str__(self):
         return "output movement : " +  str(self.product)
