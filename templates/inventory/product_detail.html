@@ -1,0 +1,57 @@
+{% extends 'inventory/home.html' %}
+{% load bootstrap4 %}
+{% load i18n static %}
+{% load crispy_forms_tags %}
+
+
+{% block pagetitle %}
+    <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mb-4 border-bottom">
+        <div class="row">
+            <div class="col-md-9">
+                <h1 class="h2">Detalhes de {{ product }}</h1>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block main_content %}
+
+<div class="row">
+    <div class="col-md-6">
+
+        <div class="row mb-6">
+            <dt class="col-sm-4">{% trans "Nome" %}</dt>
+            <dd class="col-sm-8">{{ product.name }}</dd>
+
+            <dt class="col-sm-4">{% trans "Quantidade atual" %}</dt>
+            <dd class="col-sm-8">{{ product.actual_quantity}}</dd>
+
+            <dt class="col-sm-4">{% trans "Material" %}</dt>
+            <dd class="col-sm-8">{{ product.material }}</dd>
+
+            <dt class="col-sm-4">{% trans "Capacidade/comprimento" %}</dt>
+            <dd class="col-sm-8">{{ product.capacity }}</dd>
+
+            <dt class="col-sm-4">{% trans "Localização" %}</dt>
+            <dd class="col-sm-8">{{ product.location }}</dd>
+
+            <dt class="col-sm-4">{% trans "Marca" %}</dt>
+            <dd class="col-sm-8">{{ product.brand }}</dd>
+
+            <dt class="col-sm-4">{% trans "Observações" %}</dt>
+            <dd class="col-sm-8">{{ product.obs|linebreaksbr }}</dd>
+
+            <dt class="col-sm-4">{% trans "Referência" %}</dt>
+            <dd class="col-sm-8">{{ product.reference }}</dd>
+
+            <dt class="col-sm-4">{% trans "Limite mínimo" %}</dt>
+            <dd class="col-sm-8">{{ product.min_limit }}</dd>
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

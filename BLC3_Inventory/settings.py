@@ -41,8 +41,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'inventory.apps.InventoryConfig',
     'users.apps.UsersConfig',
-
-
+    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -134,5 +133,7 @@ TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'all_products_list'
 LOGOUT_REDIRECT_URL = 'login'
+
+ACCOUNT_SIGNUP_FORM_CLASS = "accounts.forms.SignUpForm"

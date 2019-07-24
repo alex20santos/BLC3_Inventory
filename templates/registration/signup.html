@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% load i18n static %}
+{% load static %}
+
+{% block body_content %}
+    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{% url 'all_products_list' %}">Inventátio BLC3</a>
+        <ul class="navbar-nav px-3"></ul>
+    </nav>
+
+    <div class="container">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mb-4 border-bottom">
+            <h1 class="h2">{% trans "Criação de nova conta" %}</h1>
+        </div>
+        <div class="row justify-content-center align-items-center" style="height:80vh">
+            <form method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button class="btn btn-outline-primary" type="submit">Registar</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

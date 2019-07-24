@@ -16,14 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
-
 from BLC3_Inventory import views
+from inventory.views import AllProducts
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('', views.homepage, name='home'),
+    path('accounts/', include('accounts.urls')),
+    path('',AllProducts.as_view() , name='home'),
     path('users/', include('users.urls')),
     path('inventory/', include('inventory.urls')),
+
 
 ]
