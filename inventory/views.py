@@ -125,6 +125,7 @@ class ProductDetails(LoginRequiredMixin, DetailView):
     fields = '__all__'
 
     def get_context_data(self, **kwargs):
+        readExcel();
         product_id = self.kwargs.get('pk')
         product = Product.objects.get(pk=product_id)
         context = super().get_context_data(**kwargs)
