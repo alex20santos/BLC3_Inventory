@@ -8,6 +8,7 @@ from inventory.decorators import admin_required
 from inventory.filters import ProductsFilter
 from inventory.forms import OutputModelFormset, InputModelFormset
 from inventory.models import Product, OutputMovement, InputMovement
+import xlrd
 
 
 class AllProducts(LoginRequiredMixin, ListView):
@@ -100,25 +101,24 @@ def create_input(request):
 
 
 ##READ excel files
-'''
-import xlrd
-# Give the location of the file
-loc = ("simple_inv.xlsx")
+def readExcel():
+    loc = ("simple_inv.xlsx")
 
-wb = xlrd.open_workbook(loc)
-sheet = wb.sheet_by_index(0)
+    wb = xlrd.open_workbook(loc)
+    sheet = wb.sheet_by_index(0)
 
-values_to_insert = [None for _ in range(10)]
-for i in range(sheet.nrows):
-    for j in range(sheet.ncols):
-        if j == 7 :
-            values_to_insert[j-1] += sheet.cell_value(i, j)
-        else:
-            values_to_insert[j] = sheet.cell_value(i, j)
-    p = Product.create(values_to_insert[0],values_to_insert[1],values_to_insert[2],values_to_insert[3],
-        values_to_insert[4],values_to_insert[5],values_to_insert[6],values_to_insert[8],values_to_insert[9])
-    p.save() 
-'''
+    values_to_insert = [None for _ in range(10)]
+    for i in range(sheet.nrows):
+        for j in range(sheet.ncols):
+            if j == 7 :
+                values_to_insert[j-1] += sheet.cell_value(i, j)
+            else:
+                values_to_insert[j] = sheet.cell_value(i, j)
+        p = Product.create(values_to_insert[0],values_to_insert[1],values_to_insert[2],values_to_insert[3],
+                           values_to_insert[4],values_to_insert[5],values_to_insert[6],values_to_insert[8],values_to_insert[9])
+        p.save()
+
+
 
 class ProductDetails(LoginRequiredMixin, DetailView):
     model = Product
