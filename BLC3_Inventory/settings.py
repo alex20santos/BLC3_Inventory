@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
 import os
+import json
+
+with open('config.json') as config_file:
+    config = json.load(config_file)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'e7*xefqbx^b5)incs231m92_a#iqic1pkcz9ldo4xy%o3wqgug'
+SECRET_KEY = config['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -58,6 +62,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'BLC3_Inventory.urls'
 
+DEFAULT_FROM_EMAIL = config['DEFAULT_FROM_EMAIL']
+EMAIL_HOST = config['EMAIL_HOST']
+EMAIL_HOST_USER = config['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = config['EMAIL_HOST_PASSWORD']
+EMAIL_PORT = config['EMAIL_PORT']
+EMAIL_USE_TLS = True
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -89,6 +100,7 @@ DATABASES = {
     }
 }
 
+TIME_ZONE = 'Europe/Lisbon'
 
 # Password validation
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
@@ -113,8 +125,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 

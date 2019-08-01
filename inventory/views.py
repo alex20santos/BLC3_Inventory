@@ -1,14 +1,20 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 
+from BLC3_Inventory import settings
 from inventory.decorators import admin_required
 from inventory.filters import ProductsFilter
 from inventory.forms import OutputModelFormset, InputModelFormset
 from inventory.models import Product, OutputMovement, InputMovement
 import xlrd
+from django.contrib import messages
+
+from users.models import Profile
 
 
 class AllProducts(LoginRequiredMixin, ListView):
@@ -24,7 +30,10 @@ class AllProducts(LoginRequiredMixin, ListView):
         return context
 
     def get_queryset(self):
-        queryset = Product.objects.all()
+        if self.request.user.profile.is_admin:
+            queryset = Product.objects.all()
+        else:
+            queryset = Product.objects.all().filter(is_active=True)
         return ProductsFilter(self.request.GET, queryset=queryset).qs
 
 
@@ -32,7 +41,7 @@ class AllProducts(LoginRequiredMixin, ListView):
 class ProductCreate(LoginRequiredMixin, CreateView):
     model = Product
     template_name = 'inventory/create_product.html'
-    fields = '__all__'
+    fields = ['name','actual_quantity','material','capacity','location','brand','obs','reference','min_limit','is_active']
     success_url = "/"
 
     def get_context_data(self, **kwargs):
@@ -44,12 +53,32 @@ class ProductCreate(LoginRequiredMixin, CreateView):
         return super(ProductCreate, self).form_valid(form)
 
 
+
+def notify_admins_low_stock(product):
+    admins = Profile.objects.all().filter(is_admin=True)
+    for a in admins:
+        print(a.user.email)
+        message = 'Caro(a) ' +a.user.first_name +' '+ a.user.last_name + ', este email serve para informar que o ' \
+             'produto ' + product.name + ' atingiu o limite mínimo definido.' + '' \
+               '\nCumprimentos, Inventário BLC3'
+
+        send_mail(
+            'Stock de '+product.name,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [a.user.email,],
+            fail_silently = False,
+            )
+
 @login_required()
-def create_output(request):
+def create_output(request, product_id=None):
     template_name = 'inventory/remove_stock.html'
 
     if request.method == 'GET':
-        formset = OutputModelFormset(queryset=OutputMovement.objects.none())
+        if product_id is None:
+            formset = OutputModelFormset(queryset=OutputMovement.objects.none())
+        else:
+            formset = OutputModelFormset(initial=[{'product': product_id,'quantity': 0,}],queryset= OutputMovement.objects.none())
 
     elif request.method == 'POST':
         formset = OutputModelFormset(request.POST)
@@ -63,8 +92,20 @@ def create_output(request):
                 if product_obj.actual_quantity - quantity >= 0:
                     product_obj.actual_quantity = product_obj.actual_quantity - quantity
                     product_obj.save()
+                    succ_message =  'Saída de stock efetuada com sucesso no produto ' + product_obj.name
+                    messages.success(request,succ_message)
+
+                    # just to notify
+                    if product_obj.actual_quantity <= product_obj.min_limit and product_obj.is_under_limit is False:
+                        notify_admins_low_stock(product_obj)
+                        product_obj.is_under_limit = True
+                        product_obj.save()
+
+                else:
+                    warn_message =  'Não foi possível registar a saída de stock de ' + product_obj.name
+                    messages.warning(request,warn_message)
                 form.save()
-                return redirect('all_products_list')
+            return redirect('all_products_list')
 
     return render(request, template_name, {
         'formset': formset,
@@ -74,14 +115,18 @@ def create_output(request):
 
 @login_required()
 @admin_required()
-def create_input(request):
+def create_input(request,product_id=None):
     template_name = 'inventory/add_stock.html'
 
     if request.method == 'GET':
-        formset = InputModelFormset(queryset=InputMovement.objects.none())
+        if product_id is None:
+            formset = InputModelFormset(queryset=InputMovement.objects.none())
+        else:
+            formset = InputModelFormset(initial=[{'product': product_id,'quantity': 0,}],queryset= InputMovement.objects.none())
 
     elif request.method == 'POST':
         formset = InputModelFormset(request.POST)
+
 
         if formset.is_valid():
             for form in formset:
@@ -90,9 +135,16 @@ def create_input(request):
                 product = form.cleaned_data.get('product')
                 product_obj = Product.objects.get(id=product.id)
                 product_obj.actual_quantity = product_obj.actual_quantity + quantity
+
+                # update is_under_limit value
+                if product_obj.actual_quantity > product_obj.min_limit and product_obj.is_under_limit is True:
+                    product_obj.is_under_limit = False
+
                 product_obj.save()
                 form.save()
-                return redirect('all_products_list')
+                succ_message =  'Entrada de stock efetuada com sucesso no produto ' + product_obj.name
+                messages.success(request,succ_message)
+            return redirect('all_products_list')
 
     return render(request, template_name, {
         'formset': formset,
@@ -100,7 +152,7 @@ def create_input(request):
     })
 
 
-##READ excel files
+#READ excel files
 def readExcel():
     loc = ("simple_inv.xlsx")
 
@@ -132,10 +184,9 @@ class ProductDetails(LoginRequiredMixin, DetailView):
         context['product_id'] = product.id,
         return context
 
-
-class EditProduct(UpdateView):
+class EditProduct(LoginRequiredMixin, UpdateView):
     model = Product
-    fields = '__all__'
+    fields =['name','material','capacity','location','brand','obs','reference','min_limit','is_active']
     template_name = 'inventory/update_product.html'
     success_url = "/inventory/all_products/"
 
@@ -143,3 +194,20 @@ class EditProduct(UpdateView):
         context = super().get_context_data(**kwargs)
         context['active_page'] = 'all_products'
         return context
+
+
+class AllOutputMovements(LoginRequiredMixin, ListView):
+    model = OutputMovement
+    context_object_name = 'all_output_movements'
+    template_name = 'inventory/history.html'
+    queryset = Product.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_page'] = 'history'
+        context['active_sub_page'] = 'history_output'
+        return context
+
+    def get_queryset(self):
+        queryset = OutputMovement.objects.all()
+        return queryset
