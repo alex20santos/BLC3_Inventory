@@ -1,7 +1,8 @@
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
-from inventory.views import AllProducts, ProductCreate, create_output, create_input, ProductDetails, EditProduct,AllOutputMovements
+from inventory.views import AllProducts, ProductCreate, create_output, create_input, ProductDetails, EditProduct, \
+    AllOutputMovements, AllInputMovements
 
 urlpatterns = [
     path('all_products/', AllProducts.as_view(), name='all_products_list'),
@@ -12,6 +13,7 @@ urlpatterns = [
     path('add_stock/<int:product_id>', create_input, name='add_stock'),
     path('product_details/<int:pk>', ProductDetails.as_view(), name='product_details'),
     path('product_edit/<int:pk>', EditProduct.as_view(), name='product_edit'),
-    path('history/', AllOutputMovements.as_view(), name='history_output'),
+    path('output_history/', AllOutputMovements.as_view(), name='output_history'),
+    path('input_history/', AllInputMovements.as_view(), name='input_history'),
 
 ]

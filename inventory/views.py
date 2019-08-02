@@ -8,7 +8,7 @@ from django.views.generic import ListView, CreateView, DetailView, UpdateView
 
 from BLC3_Inventory import settings
 from inventory.decorators import admin_required
-from inventory.filters import ProductsFilter
+from inventory.filters import ProductsFilter, OutputMovementFilter,InputMovementFilter
 from inventory.forms import OutputModelFormset, InputModelFormset
 from inventory.models import Product, OutputMovement, InputMovement
 import xlrd
@@ -17,6 +17,7 @@ from django.contrib import messages
 from users.models import Profile
 
 
+#List all products. Hidden products included for admin
 class AllProducts(LoginRequiredMixin, ListView):
     model = Product
     context_object_name = 'all_product_list'
@@ -53,7 +54,7 @@ class ProductCreate(LoginRequiredMixin, CreateView):
         return super(ProductCreate, self).form_valid(form)
 
 
-
+#Function to send email to all admins when minimum limit is reached
 def notify_admins_low_stock(product):
     admins = Profile.objects.all().filter(is_admin=True)
     for a in admins:
@@ -70,6 +71,8 @@ def notify_admins_low_stock(product):
             fail_silently = False,
             )
 
+
+#Create output for a product or more
 @login_required()
 def create_output(request, product_id=None):
     template_name = 'inventory/remove_stock.html'
@@ -152,7 +155,7 @@ def create_input(request,product_id=None):
     })
 
 
-#READ excel files
+#Read excel file with inventory table
 def readExcel():
     loc = ("simple_inv.xlsx")
 
@@ -184,6 +187,7 @@ class ProductDetails(LoginRequiredMixin, DetailView):
         context['product_id'] = product.id,
         return context
 
+@method_decorator([login_required, admin_required, ], name='dispatch')
 class EditProduct(LoginRequiredMixin, UpdateView):
     model = Product
     fields =['name','material','capacity','location','brand','obs','reference','min_limit','is_active']
@@ -195,19 +199,37 @@ class EditProduct(LoginRequiredMixin, UpdateView):
         context['active_page'] = 'all_products'
         return context
 
-
+@method_decorator([login_required, admin_required, ], name='dispatch')
 class AllOutputMovements(LoginRequiredMixin, ListView):
     model = OutputMovement
     context_object_name = 'all_output_movements'
-    template_name = 'inventory/history.html'
-    queryset = Product.objects.all()
+    template_name = 'inventory/output_history.html'
+    queryset = OutputMovement.objects.all().order_by('-date')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['active_page'] = 'history'
-        context['active_sub_page'] = 'history_output'
+        context['active_sub_page'] = 'output_history'
+        context['filter_form'] = OutputMovementFilter(self.request.GET, queryset=OutputMovement.objects.all()).form
         return context
 
     def get_queryset(self):
-        queryset = OutputMovement.objects.all()
-        return queryset
+        queryset = OutputMovement.objects.all().order_by('-date')
+        return OutputMovementFilter(self.request.GET, queryset=queryset).qs
+
+@method_decorator([login_required, admin_required, ], name='dispatch')
+class AllInputMovements(LoginRequiredMixin, ListView):
+    model = InputMovement
+    context_object_name = 'all_input_movements'
+    template_name = 'inventory/input_history.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_page'] = 'history'
+        context['active_sub_page'] = 'input_history'
+        context['filter_form'] = InputMovementFilter(self.request.GET, queryset=OutputMovement.objects.all()).form
+        return context
+
+    def get_queryset(self):
+        queryset = InputMovement.objects.all().order_by('-date')
+        return InputMovementFilter(self.request.GET, queryset=queryset).qs

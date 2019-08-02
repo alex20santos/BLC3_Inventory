@@ -5,6 +5,9 @@ from django.urls import reverse_lazy
 from django.views import generic
 from accounts.forms import SignUpForm
 
+
+#View para sign up
+#User é colocado como inactivo
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)

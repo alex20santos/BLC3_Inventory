@@ -48,7 +48,6 @@ class OutputMovement(models.Model):
     def __str__(self):
         return "output movement : " +  str(self.product)
 
-
 class InputMovement(models.Model):
     class Meta:
         verbose_name = _('Movimentação Entrada')
