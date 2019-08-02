@@ -22,7 +22,8 @@ class AllProducts(LoginRequiredMixin, ListView):
     model = Product
     context_object_name = 'all_product_list'
     template_name = 'inventory/product_list.html'
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('name')
+    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -32,9 +33,9 @@ class AllProducts(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.profile.is_admin:
-            queryset = Product.objects.all()
+            queryset = Product.objects.all().order_by('name')
         else:
-            queryset = Product.objects.all().filter(is_active=True)
+            queryset = Product.objects.all().filter(is_active=True).order_by('name')
         return ProductsFilter(self.request.GET, queryset=queryset).qs
 
 
