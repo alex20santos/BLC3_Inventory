@@ -57,7 +57,7 @@
                     {% for reagent in all_reagents_list %}
                         <tr>
                             <td>
-                                <a href="#">
+                                <a href="{% url 'reagent_details' reagent.id %}">
                                     {{ reagent.name }}
                                 </a>
                             </td>

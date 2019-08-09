@@ -9,7 +9,7 @@ from django.contrib import messages
 
 #List all products. Hidden products included for admin
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView, UpdateView, CreateView
+from django.views.generic import ListView, UpdateView, CreateView, DetailView
 
 from inventory.decorators import admin_required
 from inventory.views import notify_admins_low_stock
@@ -183,7 +183,7 @@ class ReagentCreate(LoginRequiredMixin, CreateView):
     template_name = 'reagents/create_reagent.html'
     fields = ['name','name_en','location','grade','number','group','quantity','package_quantity','n_cas',
               'formula','manufacturer','reference','unit','min_limit','is_active']
-    success_url = "/"
+    success_url = "/reagents/all_reagents"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -192,3 +192,17 @@ class ReagentCreate(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         return super(ReagentCreate, self).form_valid(form)
+
+
+
+class ReagentDetails(LoginRequiredMixin, DetailView):
+    model = Reagent
+    fields = '__all__'
+
+    def get_context_data(self, **kwargs):
+        reagent_id = self.kwargs.get('pk')
+        product = Reagent.objects.get(pk=reagent_id)
+        context = super().get_context_data(**kwargs)
+        context['active_page'] = 'all_reagents'
+        context['reagent_id'] = product.id,
+        return context

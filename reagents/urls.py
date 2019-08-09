@@ -1,7 +1,7 @@
 from django.urls import path
 
 from reagents.views import AllReagents, EditReagent, create_output, create_input, AllOutputMovements, AllInputMovements, \
-    ReagentCreate
+    ReagentCreate, ReagentDetails
 
 urlpatterns = [
     path('new_reagent/', ReagentCreate.as_view(), name='reagent_create'),
@@ -13,5 +13,7 @@ urlpatterns = [
     path('add_stock/', create_input, name='add_stock_reagents'),
     path('output_history/', AllOutputMovements.as_view(), name='output_history_reagents'),
     path('input_history/', AllInputMovements.as_view(), name='input_history_reagents'),
+    path('reagent_details/<int:pk>', ReagentDetails.as_view(), name='reagent_details'),
+
 
 ]
