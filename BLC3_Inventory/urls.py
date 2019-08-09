@@ -26,6 +26,7 @@ urlpatterns = [
     path('',AllProducts.as_view() , name='home'),
     path('users/', include('users.urls')),
     path('inventory/', include('inventory.urls')),
+    path('reagents/', include('reagents.urls')),
 
 
 ]

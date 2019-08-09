@@ -1,0 +1,40 @@
+{% extends 'reagents/history_base.html' %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% load i18n static %}
+
+
+{% block pagetitle %}
+    <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mb-4 border-bottom">
+        <div class="row">
+            <div class="col-md-9">
+                <h1 class="h2">Histórico de movimentos de entrada</h1>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+{% block col1_h %}Reagente{% endblock %}
+{% block col2_h %}Utilizador{% endblock %}
+{% block col3_h %}Data{% endblock %}
+{% block col4_h %}Quantidade{% endblock %}
+
+{% block line %}
+    {% if all_input_movements_reagents %}
+        {% for in_movement in all_input_movements_reagents %}
+
+            <tr>
+                <th>{{ in_movement.reagent.name }}</th>
+                <td>{{ in_movement.user }}</td>
+                <td>{{ in_movement.date|date:"d/M/Y h:m"  }}</td>
+                <td>{{ in_movement.quantity }}</td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}
+
+
+{% block clean_link %}{% url "input_history_reagents" %}{% endblock %}

@@ -38,6 +38,10 @@ DEBUG = True
 ALLOWED_HOSTS = ['192.168.30.7','127.0.0.1' ]
 
 
+SESSION_COOKIE_AGE = 1800  # max inactivity time on sessions in secs
+SESSION_SAVE_EVERY_REQUEST = True
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,6 +54,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'crispy_forms',
     'inventory.apps.InventoryConfig',
+    'reagents.apps.ReagentsConfig',
     'users.apps.UsersConfig',
     'accounts.apps.AccountsConfig',
     'django_filters',

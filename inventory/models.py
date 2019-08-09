@@ -23,7 +23,7 @@ class Product(models.Model):
     brand = models.CharField(max_length=300, verbose_name=_('marca'))
     obs = models.TextField(verbose_name=_('observações'))
     reference = models.CharField(max_length=300, verbose_name=_('referência'))
-    min_limit  = models.IntegerField(verbose_name=_("limite mínimo"))
+    min_limit  = models.PositiveIntegerField(verbose_name=_("limite mínimo"))
     is_under_limit = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True,verbose_name=_("Visível"))
 

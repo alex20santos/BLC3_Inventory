@@ -8,38 +8,59 @@
 {% block styles %}
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/css/bootstrap-select.min.css">
-
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
-
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
+
 
 {% endblock %}
 
 
 {% block body_content %}
+
     <body>
-    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{% url 'all_products_list' %}">Inventário BLC3</a>
-        <ul class="navbar-nav px-3">
-            <li class="nav-item text-nowrap">
-                <a class="nav-link" href="{% url 'logout_user' %}">Terminar sessão</a>
-            </li>
+
+    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0" >
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0 d-none d-sm-block" href="{% url 'all_products_list' %}">
+            Inventário BLC3
+        </a>
+        <div class="float-left ml-1 d-block d-sm-none">
+            <a href="{% url 'all_products_list' %}">Inventário BLC3</a>
+        </div>
+        <ul class="navbar-nav px-3 ml-auto">
+            <div class="row">
+                <div class="col-m-10 mx-2">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="takW6aHzh3kI0QjRFAqgPP78TEtsPTgX0VbQa5egytTJmMHXqTJIYT34NuDVlnkJ">
+                    <a class="nav-link d-none d-sm-block"href="{% url 'logout_user' %}" ><i class="fas fa-sign-out-alt"></i> Terminar sessão</a>
+
+                    <a class="nav-link d-block d-sm-none" href="{% url 'logout_user' %}"><i class="fas fa-sign-out-alt"></i></a>
+                </div>
+            </div>
         </ul>
     </nav>
 
 
     <div class="container-fluid">
         <div class="row">
+
+            <div class="col-sm-12 hidden-lg hidden-md visible-sm toHide pt-2">
+                <select id="sub-menu" class="selectpicker form-control">
+                    <option>Navegar para...</option>
+                    <optgroup label="Consumíveis">
+                        <option value="{% url 'all_products_list' %}">Lista de Consumíveis</option>
+                    </optgroup>
+                </select>
+            </div>
+
             <nav class="col-md-2 d-none d-md-block bg-light sidebar">
                 <div class="sidebar-sticky">
-
+                    <h6 class="sidebar-heading d-flex px-3 mt-4 mb-1 text-muted">Consumíveis</h6>
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link  {% if active_page == 'all_products' %} active{% endif %}"
                                href="{% url 'all_products_list' %}">
-                                <span data-feather="shopping-cart"></span>
-                                Produtos
+                                <span data-feather="package"></span>
+                                Lista de consumíveis
                             </a>
                         </li>
                         <li class="nav-item">
@@ -65,7 +86,42 @@
                                 </a>
                                 {% block history_submenu %}
                                 {% endblock %}
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <h6 class="sidebar-heading d-flex px-3 mt-4 mb-1 text-muted">Reagentes</h6>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link  {% if active_page == 'all_reagents' %} active{% endif %}"
+                               href="{% url "all_reagents_list" %}">
+                                <i class="fas fa-flask"></i>
+                                Lista de reagentes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link  {% if active_page == 'stock_output_reagents' %} active{% endif %}"
+                               href="{% url 'remove_stock_reagents' %}">
+                                <span data-feather="log-out"></span>
+                                Saída de Stock
+                            </a>
+                        </li>
 
+                        {% if user.profile.is_admin == True %}
+                            <li class="nav-item">
+                                <a class="nav-link  {% if active_page == 'stock_input_reagents' %} active{% endif %}"
+                                   href="{% url 'add_stock_reagents' %}">
+                                    <span data-feather="log-in"></span>
+                                    Entrada de Stock
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link  {% if active_page == 'history_reagents' %} active{% endif %}"
+                                   href="{% url 'output_history_reagents' %}">
+                                    <span data-feather="file-text"></span>
+                                    Histórico
+                                </a>
+                                {% block history_submenu_reagents %}
+                                {% endblock %}
                             </li>
                         {% endif %}
                     </ul>
@@ -74,9 +130,7 @@
 
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
 
-                {% block pagetitle %}
-
-                {% endblock %}
+                {% block pagetitle %}{% endblock %}
 
                 {% if messages %}
                     {% for message in messages %}
@@ -89,9 +143,7 @@
                     {% endfor %}
                 {% endif %}
 
-                {% block main_content %}
-                {% endblock main_content %}
-
+                {% block main_content %}{% endblock main_content %}
 
                 {% block pagination %}
                     {% if  is_paginated %}
@@ -164,12 +216,9 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
             integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
             crossorigin="anonymous"></script>
-    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
-    <script src="../../assets/js/vendor/popper.min.js"></script>
-    <script src="../../dist/js/bootstrap.min.js"></script>
-
     <!-- Icons -->
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+
     <script>
         feather.replace()
     </script>

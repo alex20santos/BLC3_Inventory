@@ -8,12 +8,12 @@
     <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pb-0 mb-4 border-bottom">
         <div class="row">
             <div class="col-md-9">
-                <h1 class="h2">Consumíveis</h1>
+                <h1 class="h2">Reagentes</h1>
             </div>
             {% if user.profile.is_admin == True %}
                 <div class="col-md-3">
                     <div class="float-right">
-                        <form action="{% url 'product_create' %}">
+                        <form action="{% url 'reagent_create'  %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-outline-primary">
                                 Adicionar novo <i class="fas fa-plus"></i>
@@ -35,7 +35,7 @@
     <div class="row">
         <div class="col-md-9">
 
-            {% if all_product_list %}
+            {% if all_reagents_list %}
                 <table class="table table-striped w-100 table-sm">
                     <thead>
                     <tr>
@@ -51,21 +51,21 @@
                             <th>Entrada</th>
                         {% endif %}
                         <th>Saída</th>
-
-
                     </tr>
                     </thead>
                     <tbody>
-                    {% for product in all_product_list %}
+                    {% for reagent in all_reagents_list %}
                         <tr>
                             <td>
-                                <a href="{% url "product_details" product.id %}">
-                                    {{ product.name }}
+                                <a href="#">
+                                    {{ reagent.name }}
                                 </a>
                             </td>
-                            <td>{{ product.actual_quantity }}</td>
+                            <td>
+                                {{ reagent.quantity }} {{ reagent.get_unit_display}}
+                            </td>
                             {% if user.profile.is_admin %}
-                                {% if product.is_active %}
+                                {% if reagent.is_active %}
                                     <td>
                                         <i class="fas fa-check" style="color: #4b9000;"></i>
                                     </td>
@@ -77,7 +77,7 @@
                             {% endif %}
                             {% if user.profile.is_admin %}
                                 <td>
-                                    <a href="{% url "product_edit" product.id %}"
+                                    <a href="{% url "edit_reagent" reagent.id %}"
                                        class="btn btn-outline-warning btn-sm">
                                         <i class="far fa-edit"></i>
                                     </a>
@@ -85,18 +85,17 @@
                             {% endif %}
                             {% if user.profile.is_admin %}
                                 <td>
-
-                                    {% if product.is_active %}
-                                            <a href="{% url "add_stock" product.id %}"
-                                               class="btn btn-outline-secondary btn-sm">
-                                                <span data-feather="log-in"></span>
-                                            </a>
+                                    {% if reagent.is_active %}
+                                        <a href="{% url 'add_stock_reagents' reagent.id %}"
+                                           class="btn btn-outline-secondary btn-sm">
+                                            <span data-feather="log-in"></span>
+                                        </a>
                                     {% endif %}
                                 </td>
                             {% endif %}
                             <td>
-                                {% if product.is_active %}
-                                    <a href="{% url 'remove_stock' product.id %}" class="btn btn-outline-primary btn-sm">
+                                {% if reagent.is_active %}
+                                    <a href="{% url 'remove_stock_reagents' reagent.id %}" class="btn btn-outline-primary btn-sm">
                                         <span data-feather="log-out"></span>
                                     </a>
                                 {% endif %}

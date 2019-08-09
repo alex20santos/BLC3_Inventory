@@ -1,3 +1,4 @@
+import re
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -14,7 +15,9 @@ from inventory.models import Product, OutputMovement, InputMovement
 import xlrd
 from django.contrib import messages
 
+from reagents.models import ReagentGroup, Reagent
 from users.models import Profile
+import collections
 
 
 #List all products. Hidden products included for admin
@@ -56,12 +59,12 @@ class ProductCreate(LoginRequiredMixin, CreateView):
 
 
 #Function to send email to all admins when minimum limit is reached
-def notify_admins_low_stock(product):
+def notify_admins_low_stock(product,product_or_reagent):
     admins = Profile.objects.all().filter(is_admin=True)
     for a in admins:
         print(a.user.email)
-        message = 'Caro(a) ' +a.user.first_name +' '+ a.user.last_name + ', este email serve para informar que o ' \
-             'produto ' + product.name + ' atingiu o limite mínimo definido.' + '' \
+        message = 'Caro(a) ' +a.user.first_name +' '+ a.user.last_name + ', este email serve para informar que o ' +\
+             product_or_reagent+" " + product.name + ' atingiu o limite mínimo definido.' + '' \
                '\nCumprimentos, Inventário BLC3'
 
         send_mail(
@@ -100,8 +103,8 @@ def create_output(request, product_id=None):
                     messages.success(request,succ_message)
 
                     # just to notify
-                    if product_obj.actual_quantity <= product_obj.min_limit and product_obj.is_under_limit is False:
-                        notify_admins_low_stock(product_obj)
+                    if product_obj.actual_quantity <= product_obj.min_limit and product_obj.is_under_limit is False and product_obj.is_active:
+                        notify_admins_low_stock(product_obj,'produto')
                         product_obj.is_under_limit = True
                         product_obj.save()
 
@@ -130,8 +133,6 @@ def create_input(request,product_id=None):
 
     elif request.method == 'POST':
         formset = InputModelFormset(request.POST)
-
-
         if formset.is_valid():
             for form in formset:
                 form.instance.user = request.user
@@ -141,7 +142,7 @@ def create_input(request,product_id=None):
                 product_obj.actual_quantity = product_obj.actual_quantity + quantity
 
                 # update is_under_limit value
-                if product_obj.actual_quantity > product_obj.min_limit and product_obj.is_under_limit is True:
+                if product_obj.actual_quantity > product_obj.min_limit and product_obj.is_under_limit is True and product_obj.is_active:
                     product_obj.is_under_limit = False
 
                 product_obj.save()
@@ -157,7 +158,7 @@ def create_input(request,product_id=None):
 
 
 #Read excel file with inventory table
-def readExcel():
+def readExcelProducts():
     loc = ("simple_inv.xlsx")
 
     wb = xlrd.open_workbook(loc)
@@ -174,7 +175,46 @@ def readExcel():
                            values_to_insert[4],values_to_insert[5],values_to_insert[6],values_to_insert[8],values_to_insert[9])
         p.save()
 
+def readExcelReagents():
+    #https://stackoverflow.com/questions/24391892/printing-subscript-in-python
+    SUB = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+    loc = ("reagentes.xlsx")
+    wb = xlrd.open_workbook(loc)
+    sheet = wb.sheet_by_index(0)
+    v = []
+    unit = 0
 
+    for i in range(1,sheet.nrows):
+        for j in range(sheet.ncols):
+            if j == 0:
+                group_name = sheet.cell_value(i, j)
+            elif j == 7 or j==8:
+                value = sheet.cell_value(i, j)
+                result = re.findall(r'[A-Za-z]+|\d+', value)
+                if j==7:
+                    if result[-1] == 'g':
+                        unit = 1
+                    elif result[-1] == 'mL':
+                        unit = 2
+                    elif result[-1] == 'uni':
+                        unit = 3
+                    elif result[-1] == 'comp':
+                        unit = 4
+                    elif result[-1] == 'amp':
+                        unit = 5
+                    else:
+                        unit = 0
+                v.append(result[0])
+
+            elif j== 9:
+                v.append(sheet.cell_value(i, j).translate(SUB))
+            else:
+                v.append(sheet.cell_value(i, j))
+
+        group = ReagentGroup.objects.all().filter(name__exact=group_name)
+        r = Reagent.create(group[0],v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8],v[9],v[10],10,unit)
+        r.save()
+        v.clear()
 
 class ProductDetails(LoginRequiredMixin, DetailView):
     model = Product
@@ -228,7 +268,7 @@ class AllInputMovements(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['active_page'] = 'history'
         context['active_sub_page'] = 'input_history'
-        context['filter_form'] = InputMovementFilter(self.request.GET, queryset=OutputMovement.objects.all()).form
+        context['filter_form'] = InputMovementFilter(self.request.GET, queryset=InputMovement.objects.all()).form
         return context
 
     def get_queryset(self):
