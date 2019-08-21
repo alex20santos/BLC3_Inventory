@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse, FileResponse, Http404
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
@@ -43,7 +44,7 @@ class AllReagents(LoginRequiredMixin, ListView):
 class EditReagent(LoginRequiredMixin, UpdateView):
     model = Reagent
     fields =['name','name_en','location','grade','number','group','package_quantity','unit',
-             'n_cas','formula','manufacturer','reference','min_limit','is_active']
+             'n_cas','formula','manufacturer','reference','min_limit','is_active','tds','sds']
 
     template_name = 'reagents/update_reagent.html'
     success_url = "/reagents/all_reagents/"
@@ -182,7 +183,7 @@ class ReagentCreate(LoginRequiredMixin, CreateView):
     model = Reagent
     template_name = 'reagents/create_reagent.html'
     fields = ['name','name_en','location','grade','number','group','quantity','package_quantity','n_cas',
-              'formula','manufacturer','reference','unit','min_limit','is_active']
+              'formula','manufacturer','reference','unit','min_limit','is_active','tds','sds']
     success_url = "/reagents/all_reagents"
 
     def get_context_data(self, **kwargs):
@@ -206,3 +207,7 @@ class ReagentDetails(LoginRequiredMixin, DetailView):
         context['active_page'] = 'all_reagents'
         context['reagent_id'] = product.id,
         return context
+
+def pdf_view(request,path):
+    base_path = "/Users/alexandresantos/Documents/blc3/BLC3_Inventory/"
+    return FileResponse(open(base_path+path, 'rb'), content_type='application/pdf')

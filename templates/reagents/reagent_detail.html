@@ -35,7 +35,7 @@
             <dd class="col-sm-8">{{ reagent.package_quantity}}</dd>
 
             <dt class="col-sm-4">{% trans "Unidade" %}</dt>
-            <dd class="col-sm-8">{{ reagent.unit}}</dd>
+            <dd class="col-sm-8">{{ reagent.get_unit_display}}</dd>
 
             <dt class="col-sm-4">{% trans "Grau" %}</dt>
             <dd class="col-sm-8">{{ reagent.grade }}</dd>
@@ -63,6 +63,27 @@
 
             <dt class="col-sm-4">{% trans "Limite mínimo" %}</dt>
             <dd class="col-sm-8">{{ reagent.min_limit }}</dd>
+
+            <dt class="col-sm-4">{% trans "Ficha técnia (TDS)" %}</dt>
+            <dd class="col-sm-8">
+                {% if reagent.tds == "" %}
+                    Não existe
+                {% else %}
+                    <a href="{% url "pdf_view" reagent.tds  %}">
+                        ver
+                    </a>
+                {% endif %}
+            </dd>
+            <dt class="col-sm-4">{% trans "Ficha de segurança (SDS)" %}</dt>
+            <dd class="col-sm-8">
+                {% if reagent.sds == "" %}
+                    Não existe
+                {% else %}
+                    <a href="{% url "pdf_view" reagent.sds  %}">
+                        ver
+                    </a>
+                {% endif %}
+            </dd>
 
 
         </div>

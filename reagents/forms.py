@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import modelformset_factory
+from django.forms import modelformset_factory, Textarea
 
 from reagents.models import Reagent, OutputMovementReagent, InputMovementReagent
 
@@ -12,7 +12,6 @@ class OutputModelFormReagent(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(OutputModelFormReagent, self).__init__(*args, **kwargs)
         self.fields['reagent'].queryset = Reagent.objects.filter(is_active=True)
-
 
 class InputModelFormReagent(forms.ModelForm):
     class Meta:
@@ -28,7 +27,6 @@ OutputModelFormset = modelformset_factory(
     form=OutputModelFormReagent,
     fields=('reagent', 'quantity',),
     extra=1,
-
 )
 
 

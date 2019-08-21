@@ -19,6 +19,7 @@
     <form method="POST">
         {% csrf_token %}
         {{ formset.management_form }}
+
         {% for form in formset %}
             <div class="row form-row ">
                 <div class="form-group col-md-6">
@@ -44,7 +45,9 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
             integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
             crossorigin="anonymous"></script>
+
     <script type="text/javascript">
+
         function updateElementIndex(el, prefix, ndx) {
             var id_regex = new RegExp('(' + prefix + '-\\d+)');
             var replacement = prefix + '-' + ndx;
@@ -81,6 +84,8 @@
                 .html('-');
             return false;
         }
+
+
 
         function deleteForm(prefix, btn) {
             var total = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
